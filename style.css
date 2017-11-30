@@ -1,5 +1,7 @@
 :root {
-  --heading-color: #3a3939;
+  --heading-color: #403f3f;
+  --white: white;
+  --gray: #eaeaea;
 }
 
 body {
@@ -17,7 +19,7 @@ body {
 }
 
 .list {
-  background-color: gray;
+  background-color: lightsalmon;
   /*color: white;*/
   margin-right: 10px;
   /*color: white;*/
@@ -31,7 +33,7 @@ body {
 
 .list-header {
   width: 100%;
-  text-align: center;
+  text-align: left;
   color: var(--heading-color);
 }
 
@@ -47,7 +49,7 @@ body {
   flex-grow: 1;
   flex-basis: 100%;
   /*border-radius: 10px;*/
-  background-color: lightgray;
+  background-color: var(--gray);
   margin-top: 10px;
   padding: 10px;
 }
@@ -55,12 +57,12 @@ body {
 .list-items div:hover {
   background-color: white;
   color: gray;
-  
+
 }
 
 .button {
   /*border-radius: 5px;*/
-  background-color: lightgray;
+  background-color: var(--gray);
   color: black;
   margin-top: 10px;
   padding: 5px;
@@ -72,7 +74,7 @@ body {
 
 .add-btn {
   color: var(--header-color);
-  background-color: lightgray;
+  background-color: var(--gray);
   border-radius: 0;
   font-size: .9em;
 }
@@ -83,17 +85,15 @@ body {
 
 }
 input {
-  /*width: 100%;*/
-  padding: 10px;
+  padding: 5px;
   border: 0;
-  margin-bottom: 10px;
-  /*box-shadow: 3px 5px 5px #251d1d;*/
 }
 
 input[type="text"] {
   box-sizing: border-box;
   outline: none;
   font-size: .9em;
+  width: 75%;
 }
 
 input[type="text"]:hover {

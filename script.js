@@ -23,20 +23,20 @@ todos.today.push('exercise');
 todos.today.push('study');
 //
 
+window.addEventListener('keydown', e => {
+  if (e.key === 'c')
+    localStorage.clear();
+    console.log('cleared storage');
+});
 
 inputs.forEach((input, index) => {
   input.addEventListener('keydown', e => {
-    if (e.keyCode === 13 && input.value) {
+    if (e.key === 'Enter' && input.value) {
       let todo = document.createElement('div');
       let text = document.createTextNode(input.value);
       input.value = '';
       todo.appendChild(text);
-      todo.addEventListener('click', e => {
-        console.log(e);
-        let d = e.currentTarget;
-        console.log(d);
-        d.remove();
-      });
+      todo.addEventListener('click', e => e.currentTarget.remove());
       listItems[index].appendChild(todo);
       localStorage.setItem('todos', wrapper.innerHTML);
     }
