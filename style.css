@@ -1,101 +1,106 @@
+
+/*
+  custom css variables
+*/
 :root {
-  --heading-color: #403f3f;
+  --heading-color: #585858;
   --white: white;
   --gray: #eaeaea;
+  --note-color-orange: #dcb368;
+  --note-color-red: #de7a68;
+  --bg-color: #e4d8cd;
+  --font-cursive: 'Indie Flower', cursive;
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
   margin: 0;
   box-sizing: border-box;
-  font-family: 'arial';
+  font-family: var(--font-cursive);
+  background: var(--bg-color);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+header h1 {
+  font-size: 4em;
 }
 
 .wrapper {
-  width: 550px;
-  margin: auto;
-  padding-top: 100px;
+  flex-basis: 100%;
   display: flex;
+  justify-content: center;
   align-items: flex-start;
+
 }
 
 .list {
-  background-color: lightsalmon;
-  /*color: white;*/
-  margin-right: 10px;
-  /*color: white;*/
-  padding: 10px;
-  /*border-radius: 10px;*/
-  /*text-align: center;*/
+  background-color: var(--note-color-orange);
+  box-shadow: 5px 5px 3px 0px #a09f9f;
+  margin-right: 20px;
+  padding: 15px;
+  width: 250px;
   display: flex;
   flex-wrap: wrap;
-  max-width: 250px;
 }
 
 .list-header {
-  width: 100%;
-  text-align: left;
   color: var(--heading-color);
+  width: 100%;
+  text-align: center;
+}
+
+.list-header h2 {
+  margin-bottom: 0px;
 }
 
 .list-items {
+  color: var(--heading-color);
   width: 100%;
-  margin: 0;
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  color: var(--heading-color);
 }
 
 .list-items div {
-  flex-grow: 1;
+  font-size: 1.4em;
   flex-basis: 100%;
-  /*border-radius: 10px;*/
-  background-color: var(--gray);
-  margin-top: 10px;
-  padding: 10px;
+  padding: 2px;
 }
 
 .list-items div:hover {
-  background-color: white;
-  color: gray;
-
+  color: var(--gray);
 }
 
-.button {
-  /*border-radius: 5px;*/
-  background-color: var(--gray);
-  color: black;
-  margin-top: 10px;
-  padding: 5px;
+.input-container {
+  display: flex;
 }
 
-.list-item {
-  flex-basis: 100%;
-}
-
-.add-btn {
-  color: var(--header-color);
-  background-color: var(--gray);
-  border-radius: 0;
-  font-size: .9em;
-}
-
-.add-btn:hover {
-  color: gray;
-  background-color: white;
-
-}
-input {
-  padding: 5px;
+.list-input {
+  box-sizing: border-box;
+  outline: none;
+  font-size: 1.2em;
+  font-family: var(--font-cursive);
+  width: 80%;
+  padding: 5px 5px 5px 10px;
   border: 0;
 }
 
-input[type="text"] {
-  box-sizing: border-box;
-  outline: none;
-  font-size: .9em;
-  width: 75%;
-}
 
-input[type="text"]:hover {
-  box-shadow: none;
+.add-btn {
+  background-color: var(--heading-color);
+  color: var(--gray);
+  font-size: 1.2em;
+  padding: 5px;
+  flex-grow: 1;
+}
+.add-btn:hover {
+  color: var(--heading-color);
+  background-color: var(--gray);
 }

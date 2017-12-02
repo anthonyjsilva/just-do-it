@@ -12,6 +12,7 @@ const listItems = Array.prototype.slice.call(document.querySelectorAll('.list-it
 console.log(inputs);
 console.log(listItems);
 
+let EDIT_MODE = false;
 
 // TODO: transition to using data structures instead of so much dom manipulation
 const todos = {};
@@ -24,9 +25,22 @@ todos.today.push('study');
 //
 
 window.addEventListener('keydown', e => {
-  if (e.key === 'c')
+  if (e.key === 'e') {
+    EDIT_MODE = !EDIT_MODE;
+    let inputs = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
+    console.log(inputs);
+    inputs.forEach(input => {
+      input.style.display = EDIT_MODE ? 'flex' : 'none';
+    });
+
+    console.log('toggle edit mode');
+  }
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'c') {
     localStorage.clear();
     console.log('cleared storage');
+  }
 });
 
 inputs.forEach((input, index) => {
