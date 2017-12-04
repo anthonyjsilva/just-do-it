@@ -1,28 +1,69 @@
-// TODO: figure out how to use local storage
-const wrapper = document.querySelector('.wrapper');
-console.log(wrapper);
+let LISTS = [];
 
 if (localStorage['todos']) {
-  wrapper.innerHTML = localStorage.getItem('todos');
+  LISTS = JSON.parse(localStorage['todos']);
+} else {
+
+  console.log(LISTS);
+  // array of list objects
+  LISTS.push({name: 'This Week', color: 'red', todos: ['clean room']});
+  LISTS.push({
+    name: 'Today',
+    color: 'orange',
+    todos: ['study', 'exercise']
+  });
+  LISTS.push({
+    name: 'Workout Schedule',
+    color: 'blue',
+    todos: ['push', 'pull', 'legs']
+  });
 }
 
+const WRAPPER = document.querySelector('.wrapper');
+let INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
+let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
+render();
 
-const inputs = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
-const listItems = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
-console.log(inputs);
-console.log(listItems);
 
 let EDIT_MODE = false;
 
-// TODO: transition to using data structures instead of so much dom manipulation
-const todos = {};
-todos.thisWeek = [];
-todos.today = [];
+function render() {
+  WRAPPER.innerHTML = '';
+  LISTS.forEach(list => {
 
-todos.thisWeek.push('clean room');
-todos.today.push('exercise');
-todos.today.push('study');
-//
+    let listItems = ``;
+
+    list.todos.forEach((li, index) => {
+      listItems += `
+        <div>${li}</div>
+      `;
+    });
+
+    let template = `
+      <div class="list" style="background-color:var(--note-color-${list.color})">
+        <div class="list-header">
+          <h2>${list.name}</h2>
+          <div class="input-container">
+            <input class='list-input' type="text" placeholder="todo...">
+            <div class="add-btn">+</div>
+          </div>
+        </div>
+        <div class="list-items">
+          ${listItems}
+        </div>
+      </div>
+    `;
+    WRAPPER.innerHTML += template;
+
+  });
+  console.log(LISTS);
+  localStorage.setItem('todos', JSON.stringify(LISTS));
+  console.log(localStorage);
+  INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
+
+  LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
+
+};
 
 window.addEventListener('keydown', e => {
   if (e.key === 'e') {
@@ -30,7 +71,9 @@ window.addEventListener('keydown', e => {
     let inputs = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
     console.log(inputs);
     inputs.forEach(input => {
-      input.style.display = EDIT_MODE ? 'flex' : 'none';
+      input.style.display = EDIT_MODE
+        ? 'flex'
+        : 'none';
     });
 
     console.log('toggle edit mode');
@@ -43,16 +86,18 @@ window.addEventListener('keydown', e => {
   }
 });
 
-inputs.forEach((input, index) => {
+INPUTS.forEach((input, index) => {
   input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && input.value) {
-      let todo = document.createElement('div');
-      let text = document.createTextNode(input.value);
-      input.value = '';
-      todo.appendChild(text);
-      todo.addEventListener('click', e => e.currentTarget.remove());
-      listItems[index].appendChild(todo);
-      localStorage.setItem('todos', wrapper.innerHTML);
+    if (e.key === 'Enter' ) {
+      LISTS[index].todos.push(input.value);
+      // input.value = '';
+      render();
+      // let todo = document.createElement('div');
+      // todo.textContent = input.value;
+      // input.value = '';
+      // todo.addEventListener('click', e => e.currentTarget.remove());
+      // LIST_ITEMS[index].appendChild(todo);
+
     }
   });
 });
