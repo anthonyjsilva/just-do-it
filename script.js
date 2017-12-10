@@ -1,46 +1,72 @@
-let LISTS = [];
+// global variables for this file
+let TODOS_DATA = [];
+let EDIT_MODE = false;
+let ACTIVE_INPUT = false;
 
-if (localStorage['todos']) {
-  LISTS = JSON.parse(localStorage['todos']);
-} else {
-  LISTS.push({name: 'This Week', color: 'red', todos: ['clean room']});
-  LISTS.push({
-    name: 'Today',
-    color: 'orange',
-    todos: ['study', 'exercise']
-  });
-  LISTS.push({
-    name: 'Workout Schedule',
-    color: 'blue',
-    todos: ['push', 'pull', 'legs']
-  });
-  LISTS.push({
-    name: 'Workout Schedule',
-    color: 'red',
-    todos: ['push', 'pull', 'legs']
-  });
+// determine if localStorage is already storing data
+(localStorage['todos'])
+  ? loadFromLocalStorage()
+  : loadSeedData();
+
+function loadFromLocalStorage() {
+  TODOS_DATA = JSON.parse(localStorage['todos']);
 }
 
-const WRAPPER = document.querySelector('.wrapper');
-let EDIT_MODE = false;
+function loadSeedData() {
+  TODOS_DATA.push({name: 'This Week', color: 'red', todos: ['clean room', 'exercise']});
+  TODOS_DATA.push({name: 'Today', color: 'orange', todos: ['study']});
+}
 
-render();
+function addTodo(value, index) {
+  // modify data structure for later
+  TODOS_DATA[index].todos.push(value);
 
-function render() {
-  WRAPPER.innerHTML = '';
+  // manipulate DOM
+  let todo = document.createElement('div');
+  todo.textContent = value;
+  todo.addEventListener('click', e => removeTodo(index, e.currentTarget));
+  LIST_ITEMS[index].appendChild(todo);
 
-  LISTS.forEach(list => {
+  // update local storage
+  updateStorage();
+}
+
+function checkOffTodo(todo) {
+  // TODO: its gonna involve storing todos as another array of todo objects
+  // each todo will have name, priority, and checked
+}
+
+function removeTodo(listIndex, todo) {
+  // modify data structure for later
+  let removeIndex = TODOS_DATA[listIndex].todos.findIndex((element) =>
+    element === todo.textContent);
+  TODOS_DATA[listIndex].todos.splice(removeIndex, 1);
+
+  // manipulate DOM
+  todo.remove();
+
+  // update local storage
+  updateStorage();
+}
+
+function updateStorage() {
+  localStorage.setItem('todos', JSON.stringify(TODOS_DATA));
+  console.log('TODOS_DATA is now', TODOS_DATA);
+}
+
+function addLists() {
+  const WRAPPER = document.querySelector('.wrapper');
+
+  TODOS_DATA.forEach(list => {
     let listItems = ``;
-    list.todos.forEach((li, index) => {
-      listItems += `<div>${li}</div>`;
-    });
+    list.todos.forEach(listItem => listItems += `<div>${listItem}</div>`);
 
-    let template = `
-      <div class="list" style="background-color:var(--note-color-${list.color})">
+    let listTemplate = `
+      <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
         <div class="list-header">
           <h2>${list.name}</h2>
-          <div class="input-container" display="${((EDIT_MODE) ? 'flex' : 'none')}">
-            <input class='list-input' type="text" placeholder="todo..." autofocus>
+          <div class="input-container" style="display:${EDIT_MODE ? 'flex' : 'none'}">
+            <input class='list-input' type="text" placeholder="todo...">
             <div class="add-btn">+</div>
           </div>
         </div>
@@ -49,54 +75,48 @@ function render() {
         </div>
       </div>`;
 
-    WRAPPER.innerHTML += template;
+    WRAPPER.innerHTML += listTemplate;
   });
 
-  localStorage.setItem('todos', JSON.stringify(LISTS));
+}
 
-  let INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
-  let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items div'));
+addLists();
 
+// variables for event listeners
+let INPUT_CONTAINERS = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
+let LIST_INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
+let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
 
-  INPUTS.forEach((input, index) => {
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        LISTS[index].todos.push(input.value);
-        console.log(LIST_ITEMS);
-        render();
-        // let todo = document.createElement('div');
-        // todo.textContent = input.value;
-        // input.value = '';
-        // LIST_ITEMS[index].addEventListener('click', e => e.currentTarget.remove());
-        // LIST_ITEMS[index].appendChild(todo);
-
-      }
-    });
-  });
-
-  // LIST_ITEMS.forEach((input, index) => {
-  //   input.addEventListener('click', e => e.currentTarget.remove());
-  //   LISTS[index].todos.splice(index, 1);
-  //
-  // });
-
-};
-
+// toggle edit mode
 window.addEventListener('keydown', e => {
-  if (e.key === 'e') {
+  if (!ACTIVE_INPUT && e.key === 'e') {
     EDIT_MODE = !EDIT_MODE;
-    let inputs = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
-    console.log(inputs);
-    inputs.forEach(input => {
-      input.style.display = EDIT_MODE ? 'flex' : 'none';
-    });
-
-    console.log('toggle edit mode');
+    INPUT_CONTAINERS.forEach(input =>
+      input.style.display = EDIT_MODE ? 'flex' : 'none');
   }
 });
+
+// clear local storage
 window.addEventListener('keydown', e => {
-  if (e.key === 'c') {
+  if (e.key === 'c')
     localStorage.clear();
-    console.log('cleared storage');
-  }
+});
+
+// input event listeners
+LIST_INPUTS.forEach((input, index) => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      addTodo(input.value, index);
+      input.value = '';
+    }
+  });
+  input.addEventListener('focusin', e => ACTIVE_INPUT = true);
+  input.addEventListener('focusout', e => ACTIVE_INPUT = false);
+});
+
+// todo event listeners
+LIST_ITEMS.forEach((list, listIndex) => {
+  let children = Array.prototype.slice.call(list.children);
+  children.forEach((child, childIndex) =>
+    child.addEventListener('click', () => removeTodo(listIndex, child)));
 });
