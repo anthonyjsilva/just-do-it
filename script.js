@@ -1,45 +1,72 @@
 // global variables for this file
-let TODOS_DATA = [];
+TODOS_DATA = [];
 let EDIT_MODE = false;
 let ACTIVE_INPUT = false;
+
+const todoObject = (value, priority = 1) => ({name: value, priority: priority, checked: false});
+
 
 // determine if localStorage is already storing data
 (localStorage['todos'])
   ? loadFromLocalStorage()
   : loadSeedData();
 
+console.log(TODOS_DATA);
+
 function loadFromLocalStorage() {
   TODOS_DATA = JSON.parse(localStorage['todos']);
 }
 
 function loadSeedData() {
-  TODOS_DATA.push({name: 'This Week', color: 'red', todos: ['clean room', 'exercise']});
-  TODOS_DATA.push({name: 'Today', color: 'orange', todos: ['study']});
+  TODOS_DATA.push({
+    name: 'This Week',
+    color: 'red',
+    todos: [todoObject('workout'), todoObject('clean')]
+  });
+  TODOS_DATA.push({
+    name: 'Today',
+    color: 'orange',
+    todos: [todoObject('clean')]
+  });
 }
+
 
 function addTodo(value, index) {
   // modify data structure for later
-  TODOS_DATA[index].todos.push(value);
+  TODOS_DATA[index].todos.push(todoObject(value));
 
   // manipulate DOM
   let todo = document.createElement('div');
   todo.textContent = value;
-  todo.addEventListener('click', e => removeTodo(index, e.currentTarget));
+  todo.addEventListener('click', e => {
+    if (EDIT_MODE)
+      removeTodo(index, e.currentTarget)
+    else
+      toggleTodo(index, e.currentTarget)
+  });
   LIST_ITEMS[index].appendChild(todo);
 
   // update local storage
   updateStorage();
 }
 
-function checkOffTodo(todo) {
-  // TODO: its gonna involve storing todos as another array of todo objects
-  // each todo will have name, priority, and checked
+function toggleTodo(listIndex, todo) {
+
+  // modify data structure for later
+  let toggleIndex = TODOS_DATA[listIndex].todos.findIndex((element) => element.name === todo.textContent);
+  let target = TODOS_DATA[listIndex].todos[toggleIndex];
+  target.checked = !target.checked;
+
+  // manipulate DOM
+  todo.classList.toggle('checked');
+
+  // update local storage
+  updateStorage();
 }
 
 function removeTodo(listIndex, todo) {
   // modify data structure for later
-  let removeIndex = TODOS_DATA[listIndex].todos.findIndex((element) =>
-    element === todo.textContent);
+  let removeIndex = TODOS_DATA[listIndex].todos.findIndex((element) => element.name === todo.textContent);
   TODOS_DATA[listIndex].todos.splice(removeIndex, 1);
 
   // manipulate DOM
@@ -59,13 +86,15 @@ function addLists() {
 
   TODOS_DATA.forEach(list => {
     let listItems = ``;
-    list.todos.forEach(listItem => listItems += `<div>${listItem}</div>`);
+    list.todos.forEach(listItem => listItems += `<div class="${listItem.checked ? 'checked' : ''}">${listItem.name}</div>`);
 
     let listTemplate = `
       <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
         <div class="list-header">
           <h2>${list.name}</h2>
-          <div class="input-container" style="display:${EDIT_MODE ? 'flex' : 'none'}">
+          <div class="input-container" style="display:${EDIT_MODE
+      ? 'flex'
+      : 'none'}">
             <input class='list-input' type="text" placeholder="todo...">
             <div class="add-btn">+</div>
           </div>
@@ -91,8 +120,10 @@ let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-ite
 window.addEventListener('keydown', e => {
   if (!ACTIVE_INPUT && e.key === 'e') {
     EDIT_MODE = !EDIT_MODE;
-    INPUT_CONTAINERS.forEach(input =>
-      input.style.display = EDIT_MODE ? 'flex' : 'none');
+    INPUT_CONTAINERS.forEach(
+      input => input.style.display = EDIT_MODE
+      ? 'flex'
+      : 'none');
   }
 });
 
@@ -100,7 +131,8 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keydown', e => {
   if (e.key === 'c')
     localStorage.clear();
-});
+  }
+);
 
 // input event listeners
 LIST_INPUTS.forEach((input, index) => {
@@ -117,6 +149,10 @@ LIST_INPUTS.forEach((input, index) => {
 // todo event listeners
 LIST_ITEMS.forEach((list, listIndex) => {
   let children = Array.prototype.slice.call(list.children);
-  children.forEach((child, childIndex) =>
-    child.addEventListener('click', () => removeTodo(listIndex, child)));
+  children.forEach((child, childIndex) => child.addEventListener('click', () => {
+    if (EDIT_MODE)
+      removeTodo(listIndex, child)
+    else
+      toggleTodo(listIndex, child)
+  }));
 });

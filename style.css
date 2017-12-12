@@ -5,7 +5,8 @@
 :root {
   --heading-color: #585858;
   --white: white;
-  --gray: #eaeaea;
+  --dark: #3c3535;
+  --checked: #7d7474;
   --note-color-orange: #dcb368;
   --note-color-red: #de7a68;
   --note-color-blue: #68dcdc;
@@ -60,24 +61,35 @@ header h1 {
 
 .list-header h2 {
   margin-bottom: 10px;
+  color: var(--dark);
 }
 
 .list-items {
+  min-height: 50px;
   color: var(--heading-color);
   width: 100%;
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content:flex-start;
 }
 
 .list-items div {
   font-size: 1.4em;
   flex-basis: 100%;
   padding: 2px;
+  cursor: pointer;
+}
+
+.list-items .checked,
+.list-items .checked:hover {
+  color: var(--checked);
+  text-decoration: line-through;
 }
 
 .list-items div:hover {
-  color: var(--gray);
+  color: var(--dark);
 }
 
 .input-container {
@@ -101,8 +113,9 @@ header h1 {
 }
 
 .add-btn {
-  background-color: var(--heading-color);
-  color: var(--gray);
+  background-color: rgba(60, 60, 60, .1);
+  color: var(--dark);
+  /*border-left: 2px solid var(--dark);*/
   font-size: 1.2em;
   padding: 5px;
   flex-grow: 1;
