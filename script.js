@@ -91,12 +91,17 @@ function addLists() {
     let listTemplate = `
       <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
         <div class="list-header">
+          <div class="list-options">
+            <i class="fas fa-plus"></i>
+            <i class="fas fa-edit"></i>
+            <i class="fas fa-trash-alt"></i>
+          </div>
           <h2>${list.name}</h2>
           <div class="input-container" style="display:${EDIT_MODE
       ? 'flex'
       : 'none'}">
             <input class='list-input' type="text" placeholder="todo...">
-            <div class="add-btn">+</div>
+            <div class="add-btn"> <i class="fas fa-plus"></i> </div>
           </div>
         </div>
         <div class="list-items">
@@ -115,6 +120,20 @@ addLists();
 let INPUT_CONTAINERS = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
 let LIST_INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
 let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
+
+let ADD_BUTTONS = Array.prototype.slice.call(document.querySelectorAll('.list-options .fa-plus'));
+
+ADD_BUTTONS.forEach((btn, index) => {
+  btn.addEventListener('click', e => {
+    console.log('clicked');
+    EDIT_MODE = !EDIT_MODE;
+    INPUT_CONTAINERS.forEach(
+      input => input.style.display = EDIT_MODE
+      ? 'flex'
+      : 'none');
+  });
+});
+console.log(ADD_BUTTONS);
 
 // toggle edit mode
 window.addEventListener('keydown', e => {
