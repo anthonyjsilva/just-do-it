@@ -108,6 +108,14 @@ svg:hover {
   flex-basis: 100%;
   padding: 2px;
   cursor: pointer;
+  position: relative;
+}
+.list-items div span{
+  font-size: .8em;
+  opacity: 0;
+}
+.list-items div span:hover{
+  opacity: 1;
 }
 
 .list-items .checked, .list-items .checked:hover {

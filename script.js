@@ -7,14 +7,14 @@ const todoObject = (value, priority = 1) => ({name: value, priority: priority, c
 
 
 // determine if localStorage is already storing data
-(localStorage['todos'])
+(localStorage['todos_dev'])
   ? loadFromLocalStorage()
   : loadSeedData();
 
 console.log(TODOS_DATA);
 
 function loadFromLocalStorage() {
-  TODOS_DATA = JSON.parse(localStorage['todos']);
+  TODOS_DATA = JSON.parse(localStorage['todos_dev']);
 }
 
 function loadSeedData() {
@@ -29,6 +29,14 @@ function loadSeedData() {
     todos: [todoObject('clean')]
   });
 }
+
+const listModel = {
+  name: 'name',
+  color: 'red',
+  todos: [todoObject('clean')],
+
+
+};
 
 
 function addTodo(value, index) {
@@ -77,7 +85,7 @@ function removeTodo(listIndex, todo) {
 }
 
 function updateStorage() {
-  localStorage.setItem('todos', JSON.stringify(TODOS_DATA));
+  localStorage.setItem('todos_dev', JSON.stringify(TODOS_DATA));
   console.log('TODOS_DATA is now', TODOS_DATA);
 }
 
@@ -86,14 +94,21 @@ function addLists() {
 
   TODOS_DATA.forEach(list => {
     let listItems = ``;
-    list.todos.forEach(listItem => listItems += `<div class="${listItem.checked ? 'checked' : ''}">${listItem.name}</div>`);
+    list.todos.forEach(listItem => listItems +=
+      `<div class="${listItem.checked ? 'checked' : ''}">
+        ${listItem.name}
+        <span>
+          <i class="fas fa-edit"></i>
+          <i class="fas fa-trash-alt"></i>
+        </span>
+      </div>`);
 
     let listTemplate = `
       <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
         <div class="list-header">
           <div class="list-options">
             <i class="fas fa-plus"></i>
-            <i class="fas fa-edit"></i>
+            <i class="fas fa-sync-alt"></i>
             <i class="fas fa-trash-alt"></i>
           </div>
           <h2>${list.name}</h2>
@@ -149,7 +164,7 @@ window.addEventListener('keydown', e => {
 // clear local storage
 window.addEventListener('keydown', e => {
   if (e.key === 'c')
-    localStorage.clear();
+    localStorage.removeItem('todos_dev');
   }
 );
 
