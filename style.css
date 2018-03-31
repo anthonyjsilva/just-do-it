@@ -2,14 +2,14 @@
   custom css variables
 */
 :root {
-  --heading-color: #585858;
+  --heading-color: #686060;
   --white: white;
-  --dark: #3c3535;
+  --dark: #474141;
   --checked: #7d7474;
   --note-color-orange: #dcb368;
   --note-color-red: #de7a68;
   --note-color-blue: #68dcdc;
-  --bg-color: #e4d8cd;
+  --bg-color: #f9f0e8;
   --font-cursive: 'Indie Flower', cursive;
 }
 
@@ -33,9 +33,10 @@ header h1 {
   font-size: 4em;
   color: var(--heading-color);
   text-shadow: 2px 2px 2px #b1b1b1;
+  font-family: arial;
 }
 
-.wrapper {
+.lists {
   flex-basis: 100%;
   display: flex;
   justify-content: center;
@@ -46,18 +47,14 @@ header h1 {
   background-color: var(--note-color-orange);
   box-shadow: 2px 2px 1px 0px #a09f9f;
   margin-right: 20px;
-  padding: 15px;
+  padding: 20px;
   width: 250px;
   display: flex;
   flex-wrap: wrap;
   position: relative;
+  border-radius: 4px;
 }
 
-.list:hover {
-  box-shadow: 5px 5px 3px 0px #a09f9f;
-  top: -5px;
-  /*left: -5px;*/
-}
 
 .list-options {
   opacity: 0;
@@ -80,57 +77,73 @@ svg:hover {
   color: var(--dark);
 }
 
-.list-header {
+.list__header {
   color: var(--heading-color);
   width: 100%;
   text-align: center;
 }
 
-.list-header h2 {
+.list__title {
   margin-bottom: 10px;
   color: var(--dark);
 }
 
-.list-items {
+.list__items {
   min-height: 50px;
   color: var(--heading-color);
   width: 100%;
   margin-top: 10px;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
   justify-content: flex-start;
 }
 
-.list-items div {
+.list__item {
+  padding: 0;
+  padding-left: 10px;
   font-size: 1.4em;
   flex-basis: 100%;
-  padding: 2px;
   cursor: pointer;
   position: relative;
+  list-style-type: none;
+  border-radius: 4px;
+
 }
-.list-items div span{
+.list__item--done {
+  text-decoration: line-through;
+}
+.list__item:hover {
+  background: rgba(60, 60, 60, .1);
+
+}
+
+.list__items div span{
   font-size: .8em;
   opacity: 0;
 }
-.list-items div span:hover{
+.list__items div span:hover{
   opacity: 1;
 }
 
-.list-items .checked, .list-items .checked:hover {
+.list__items .checked, .list__items .checked:hover {
   color: var(--checked);
   text-decoration: line-through;
 }
 
-.list-items div:hover {
+.list__items div:hover {
   color: var(--dark);
 }
 
-.input-container {
+.list__input-container {
+
   display: flex;
 }
 
-.list-input {
+.list__input {
+  border-radius: 4px;
+  
   box-sizing: border-box;
   outline: none;
   font-size: 1.2em;
@@ -146,15 +159,18 @@ svg:hover {
   color: rgb(60, 60, 60);
 }
 
-.add-btn {
+.list__input-add-btn {
   background-color: rgba(60, 60, 60, .1);
   color: var(--dark);
   /*border-left: 2px solid var(--dark);*/
   font-size: 1.2em;
   padding: 5px;
   flex-grow: 1;
+  outline: none;
+  border: none;
 }
 
-.add-btn:hover {
+.list__input-add-btn:hover {
+  background: rgba(60, 60, 60, .2);
   cursor: pointer;
 }
