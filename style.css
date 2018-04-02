@@ -109,10 +109,12 @@ svg:hover {
   position: relative;
   list-style-type: none;
   border-radius: 4px;
-
+  display: flex;
+  justify-content: space-between;
 }
 .list__item--done {
   text-decoration: line-through;
+  color: rgba(0, 0, 0, .2);
 }
 .list__item:hover {
   background: rgba(60, 60, 60, .1);
@@ -127,8 +129,9 @@ svg:hover {
   opacity: 1;
 }
 
-.list__items .checked, .list__items .checked:hover {
-  color: var(--checked);
+.list__item .checked, .list__item .checked:hover {
+  /* color: var(--checked); */
+  color: rgba(0, 0, 0, .2);
   text-decoration: line-through;
 }
 
@@ -137,18 +140,18 @@ svg:hover {
 }
 
 .list__input-container {
-
+  /* border-radius: 4px; */
   display: flex;
 }
 
 .list__input {
-  border-radius: 4px;
-  
   box-sizing: border-box;
   outline: none;
   font-size: 1.2em;
   font-family: var(--font-cursive);
-  width: 80%;
+  width: 78%;
+  margin-right: 2%;
+  border-radius: 4px;
   padding: 5px 5px 5px 10px;
   border: 0;
   background: rgba(60, 60, 60, .1);
@@ -160,6 +163,8 @@ svg:hover {
 }
 
 .list__input-add-btn {
+  border-radius: 4px;
+
   background-color: rgba(60, 60, 60, .1);
   color: var(--dark);
   /*border-left: 2px solid var(--dark);*/
@@ -168,6 +173,16 @@ svg:hover {
   flex-grow: 1;
   outline: none;
   border: none;
+}
+
+.list__item-delete-btn {
+  text-decoration: none;
+  padding: 5px;
+}
+
+.list__item-delete-btn:hover {
+  background-color: rgba(60, 60, 60, .1);
+  padding: 5px;
 }
 
 .list__input-add-btn:hover {

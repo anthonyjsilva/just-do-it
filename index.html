@@ -61,18 +61,29 @@
       this.reset();
     }
 
+    function removeItem(e) {
+      if (!e.target.matches('span')) return; // skip this unless it's a span
+      e.preventDefault();
+      const el = e.target;
+      const index = el.dataset.index;
+      items.splice(index, 1);
+      populateList(items, itemsList);
+      localStorage.setItem('items', JSON.stringify(items));
+    }
+
     function populateList(items = [], itemsList) {
       itemsList.innerHTML = items.map((item, i) => {
         return `
           <li class="list__item ${item.done ? 'list__item--done' : ''}" data-index=${i}>
             ${item.text}
+            <span class="list__item-delete-btn" data-index=${i}>X</span>
           </li>
         `;
       }).join('');
     }
 
     function toggleDone(e) {
-      // if (!e.target.matches('input')) return; // skip this unless it's an input
+      if (e.target.matches('span')) return; // skip this unless it's not a span
       const el = e.target;
       const index = el.dataset.index;
       items[index].done = !items[index].done;
@@ -82,6 +93,7 @@
 
     addItems.addEventListener('submit', addItem);
     itemsList.addEventListener('click', toggleDone);
+    itemsList.addEventListener('click', removeItem);
 
     populateList(items, itemsList);
 
