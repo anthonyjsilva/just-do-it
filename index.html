@@ -24,40 +24,9 @@
     <h1>Just Do It</h1>
   </header>
 
-  <div class="lists-container">
-
-    <!--
-    <div class="list">
-      <div class="list__header">
-        <h2 class="list__title">Today</h2>
-        <form class="add-items list__input-container">
-          <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
-          <button class="list__input-add-btn" type="submit">+</button>
-        </form>
-      </div>
-      <ul class="list__items">
-        <li>Nothing here :(</li>
-      </ul>
-    </div>
-
-    <div style="background-color:var(--note-color-blue)" class="list">
-      <div class="list__header">
-        <h2 class="list__title">Daily</h2>
-        <form class="add-items2 list__input-container">
-          <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
-          <button class="list__input-add-btn" type="submit">+</button>
-        </form>
-      </div>
-      <ul class="list__items2">
-        <li>No items :(</li>
-      </ul>
-    </div> -->
-
-  </div>
+  <div class="lists-container"></div>
 
   <script type="text/javascript">
-
-
 
     function addItem(e) {
       console.log(e);
@@ -69,15 +38,24 @@
       };
 
       const listIndex = e.target.dataset.listIndex;
+
       initialState[listIndex].items.push(item);
 
-      reRender();
-      // localStorage.setItem('items', JSON.stringify(items));
-      // this.reset();
-      (this.querySelector('[name=item]')).focus();
+      let ll = document.querySelectorAll(`.list__items`);
+      l = ll[listIndex];
+      l.innerHTML += (`
+        <li class="list__item" data-index=${initialState[listIndex].items.length}>
+          ${item.text}
+          <span class="list__item-delete-btn" data-index=${initialState[listIndex].items.length}>X</span>
+        </li>
+      `);
+      (this.querySelector('[name=item]')).value = '';
+
+      localStorage.setItem('items', JSON.stringify(initialState));
+      // (this.querySelector('[name=item]')).focus();
     }
 
-    const initialState = [
+    const initialState = JSON.parse(localStorage.getItem('items')) || [
       {
         title: 'Today',
         color: 'orange',
@@ -127,13 +105,11 @@
       const itemIndex = el.dataset.index;
       const listIndex = el.parentElement.dataset.listIndex;
 
+      e.target.classList.toggle('list__item--done');
       // flip the boolean value
       const value = initialState[listIndex].items[itemIndex].done;
       initialState[listIndex].items[itemIndex].done = !value;
-
-      reRender();
-
-      // localStorage.setItem('items', JSON.stringify(items));
+      localStorage.setItem('items', JSON.stringify(initialState));
     }
 
     function removeItem(e) {
@@ -142,9 +118,9 @@
       const el = e.target;
       const itemIndex = el.dataset.index;
       const listIndex = e.path[2].dataset.listIndex;
+      e.path[1].remove();
       initialState[listIndex].items.splice(itemIndex, 1);
-      reRender();
-      // localStorage.setItem('items', JSON.stringify(items));
+      localStorage.setItem('items', JSON.stringify(initialState));
     }
 
     function populateLists(lists = []) {
@@ -154,7 +130,7 @@
             <div class="list__header">
               <h2 class="list__title">${list.title}</h2>
               <form class="add-items list__input-container" data-list-index=${i}>
-                <input class="list__input" type="text" name="item" placeholder="todo...">
+                <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
                 <button class="list__input-add-btn" type="submit">+</button>
               </form>
             </div>
@@ -182,7 +158,6 @@
     addItems.forEach((el) => {
       el.addEventListener('submit', addItem);
     });
-    // const items = JSON.parse(localStorage.getItem('items')) || [];
 
     function reRender() {
       populateLists(initialState);
