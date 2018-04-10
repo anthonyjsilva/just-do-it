@@ -24,8 +24,9 @@
     <h1>Just Do It</h1>
   </header>
 
-  <div class="lists">
+  <div class="lists-container">
 
+    <!--
     <div class="list">
       <div class="list__header">
         <h2 class="list__title">Today</h2>
@@ -35,7 +36,7 @@
         </form>
       </div>
       <ul class="list__items">
-        <li>No items :(</li>
+        <li>Nothing here :(</li>
       </ul>
     </div>
 
@@ -50,17 +51,16 @@
       <ul class="list__items2">
         <li>No items :(</li>
       </ul>
-    </div>
+    </div> -->
 
   </div>
 
   <script type="text/javascript">
 
-    const addItems = document.querySelector('.add-items');
-    const itemsList = document.querySelector('.list__items');
-    const items = JSON.parse(localStorage.getItem('items')) || [];
+
 
     function addItem(e) {
+      console.log(e);
       e.preventDefault();
       const text = (this.querySelector('[name=item]')).value;
       const item = {
@@ -68,24 +68,48 @@
         done: false
       };
 
-      items.push(item);
-      populateList(items, itemsList);
-      localStorage.setItem('items', JSON.stringify(items));
-      this.reset();
+      const listIndex = e.target.dataset.listIndex;
+      initialState[listIndex].items.push(item);
+
+      reRender();
+      // localStorage.setItem('items', JSON.stringify(items));
+      // this.reset();
+      (this.querySelector('[name=item]')).focus();
     }
 
-    function removeItem(e) {
-      if (!e.target.matches('span')) return; // skip this unless it's a span
-      e.preventDefault();
-      const el = e.target;
-      const index = el.dataset.index;
-      items.splice(index, 1);
-      populateList(items, itemsList);
-      localStorage.setItem('items', JSON.stringify(items));
-    }
+    const initialState = [
+      {
+        title: 'Today',
+        color: 'orange',
+        items: [
+          {
+            done: false,
+            text: 'Do the one thing'
+          },
+          {
+            done: true,
+            text: 'Do another thing'
+          }
+        ]
+      },
+      {
+        title: 'Daily',
+        color: 'blue',
+        items: [
+          {
+            done: false,
+            text: 'Do the one thing'
+          },
+          {
+            done: true,
+            text: 'Do another thing'
+          }
+        ]
+      }
+    ];
 
-    function populateList(items = [], itemsList) {
-      itemsList.innerHTML = items.map((item, i) => {
+    function populateList(items) {
+      return items.map((item, i) => {
         return `
           <li class="list__item ${item.done ? 'list__item--done' : ''}" data-index=${i}>
             ${item.text}
@@ -95,24 +119,87 @@
       }).join('');
     }
 
+
     function toggleDone(e) {
       if (e.target.matches('span')) return; // skip this unless it's not a span
+      e.preventDefault();
       const el = e.target;
-      const index = el.dataset.index;
-      items[index].done = !items[index].done;
-      localStorage.setItem('items', JSON.stringify(items));
-      populateList(items, itemsList);
+      const itemIndex = el.dataset.index;
+      const listIndex = el.parentElement.dataset.listIndex;
+
+      // flip the boolean value
+      const value = initialState[listIndex].items[itemIndex].done;
+      initialState[listIndex].items[itemIndex].done = !value;
+
+      reRender();
+
+      // localStorage.setItem('items', JSON.stringify(items));
     }
 
-    addItems.addEventListener('submit', addItem);
-    itemsList.addEventListener('click', toggleDone);
-    itemsList.addEventListener('click', removeItem);
+    function removeItem(e) {
+      if (!e.target.matches('span')) return; // skip this unless it's a span
+      e.preventDefault();
+      const el = e.target;
+      const itemIndex = el.dataset.index;
+      const listIndex = e.path[2].dataset.listIndex;
+      initialState[listIndex].items.splice(itemIndex, 1);
+      reRender();
+      // localStorage.setItem('items', JSON.stringify(items));
+    }
 
-    populateList(items, itemsList);
+    function populateLists(lists = []) {
+      listsContainer.innerHTML = lists.map((list, i) => {
+        return (`
+          <div class="list list--${list.color}" data-index=${i}>
+            <div class="list__header">
+              <h2 class="list__title">${list.title}</h2>
+              <form class="add-items list__input-container" data-list-index=${i}>
+                <input class="list__input" type="text" name="item" placeholder="todo...">
+                <button class="list__input-add-btn" type="submit">+</button>
+              </form>
+            </div>
+            <ul class="list__items" data-list-index=${i}>
+              ${populateList(list.items)}
+            </ul>
+          </div>
+        `);
+      }).join('');
+    }
 
-  </script>
-  <script>
-    FontAwesomeConfig = {
+    const listsContainer = document.querySelector('.lists-container');
+
+    populateLists(initialState);
+
+    let itemsList = [];
+    itemsList = [...document.querySelectorAll('.list__items')];
+    itemsList.forEach((el) => {
+      el.addEventListener('click', toggleDone);
+      el.addEventListener('click', removeItem);
+    });
+
+    let addItems = [];
+    addItems = [...document.querySelectorAll('.add-items')];
+    addItems.forEach((el) => {
+      el.addEventListener('submit', addItem);
+    });
+    // const items = JSON.parse(localStorage.getItem('items')) || [];
+
+    function reRender() {
+      populateLists(initialState);
+      itemsList = [...document.querySelectorAll('.list__items')];
+      itemsList.forEach((el) => {
+        el.addEventListener('click', toggleDone);
+        el.addEventListener('click', removeItem);
+      });
+      addItems = [...document.querySelectorAll('.add-items')];
+      addItems.forEach((el) => {
+        el.addEventListener('submit', addItem);
+      });
+    }
+
+  // </script>
+<script>
+    FonAwesomeConfig = {
       autoReplaceSvg: 'nest'
     }
   </script>

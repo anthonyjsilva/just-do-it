@@ -9,7 +9,7 @@
   --note-color-orange: #ecbc64;
   --note-color-red: #de7a68;
   --note-color-blue: #68dcdc;
-  --bg-color: #f5f5f5;
+  --bg-color: #efe9d4;
   --font-cursive: 'Indie Flower', cursive;
 }
 
@@ -32,12 +32,13 @@ body {
 header h1 {
   font-size: 4em;
   color: var(--heading-color);
+  color: #60605f;
   text-shadow: 2px 2px 2px #b1b1b1;
-  font-family: arial;
+  /* font-family: arial; */
   text-transform: uppercase;
 }
 
-.lists {
+.lists-container {
   flex-basis: 100%;
   display: flex;
   justify-content: center;
@@ -45,7 +46,6 @@ header h1 {
 }
 
 .list {
-  background-color: var(--note-color-orange);
   box-shadow: 2px 2px 1px 0px #a09f9f;
   margin-right: 20px;
   padding: 20px;
@@ -56,6 +56,16 @@ header h1 {
   border-radius: 4px;
 }
 
+.list--orange {
+  background-color: var(--note-color-orange);
+}
+.list--blue {
+  background-color: var(--note-color-blue);
+}
+.list--red {
+  background-color: var(--note-color-red);
+
+}
 
 .list-options {
   opacity: 0;
