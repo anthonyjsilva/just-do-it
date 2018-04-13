@@ -7,7 +7,7 @@
   --dark: #5d5555;
   --checked: #7d7474;
   --note-color-orange: #ecbc64;
-  --note-color-red: #de7a68;
+  --note-color-red: #df7575;
   --note-color-blue: #68dcdc;
   --bg-color: #efe9d4;
   --font-cursive: 'Indie Flower', cursive;
@@ -122,11 +122,9 @@ svg:hover {
   border-radius: 4px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
-.list__item--done {
-  text-decoration: line-through;
-  color: rgba(0, 0, 0, .2);
-}
+
 .list__item:hover {
   background: rgba(60, 60, 60, .1);
 
@@ -186,6 +184,13 @@ svg:hover {
   border: none;
 }
 
+.list__item-item-text {
+  flex-grow: 1;
+}
+.list__item-item-text--done {
+  text-decoration: line-through;
+  color: rgba(0, 0, 0, .2);
+}
 .list__item-delete-btn {
   text-decoration: none;
   padding: 5px;

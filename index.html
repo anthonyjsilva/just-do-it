@@ -43,10 +43,11 @@
 
       let ll = document.querySelectorAll(`.list__items`);
       l = ll[listIndex];
+      let len = initialState[listIndex].items.length;
       l.innerHTML += (`
-        <li class="list__item" data-index=${initialState[listIndex].items.length}>
-          ${item.text}
-          <span class="list__item-delete-btn" data-index=${initialState[listIndex].items.length}>X</span>
+        <li class="list__item" data-index=${len}>
+          <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${len}>${item.text}</span>
+          <span class="list__item-delete-btn" data-index=${len}>X</span>
         </li>
       `);
       (this.querySelector('[name=item]')).value = '';
@@ -57,40 +58,27 @@
 
     const initialState = JSON.parse(localStorage.getItem('items')) || [
       {
+        title: 'This Week',
+        color: 'red',
+        items: [ { done: false, text: 'Do the one thing' } ]
+      },
+      {
         title: 'Today',
         color: 'orange',
-        items: [
-          {
-            done: false,
-            text: 'Do the one thing'
-          },
-          {
-            done: true,
-            text: 'Do another thing'
-          }
-        ]
+        items: [ { done: false, text: 'Do the one thing' } ]
       },
       {
         title: 'Daily',
         color: 'blue',
-        items: [
-          {
-            done: false,
-            text: 'Do the one thing'
-          },
-          {
-            done: true,
-            text: 'Do another thing'
-          }
-        ]
+        items: [ { done: false, text: 'Do the one thing' } ]
       }
     ];
 
     function populateList(items) {
       return items.map((item, i) => {
         return `
-          <li class="list__item ${item.done ? 'list__item--done' : ''}" data-index=${i}>
-            ${item.text}
+          <li class="list__item" data-index=${i}>
+            <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${i}>${item.text}</span>
             <span class="list__item-delete-btn" data-index=${i}>X</span>
           </li>
         `;
@@ -99,13 +87,13 @@
 
 
     function toggleDone(e) {
-      if (e.target.matches('span')) return; // skip this unless it's not a span
+      if (!e.target.matches('.list__item-item-text')) return; // skip this unless it's not a span
       e.preventDefault();
       const el = e.target;
       const itemIndex = el.dataset.index;
-      const listIndex = el.parentElement.dataset.listIndex;
+      const listIndex = e.path[2].dataset.listIndex;
 
-      e.target.classList.toggle('list__item--done');
+      e.target.classList.toggle('list__item-item-text--done');
       // flip the boolean value
       const value = initialState[listIndex].items[itemIndex].done;
       initialState[listIndex].items[itemIndex].done = !value;
@@ -113,13 +101,23 @@
     }
 
     function removeItem(e) {
-      if (!e.target.matches('span')) return; // skip this unless it's a span
+      if (!e.target.matches('.list__item-delete-btn')) return; // skip this unless it's a span
+      console.log(e);
+
       e.preventDefault();
       const el = e.target;
       const itemIndex = el.dataset.index;
       const listIndex = e.path[2].dataset.listIndex;
+
+      let btns = [...e.path[2].querySelectorAll(`.list__item-delete-btn`)];
+      let btnIndex = btns.findIndex((btn) => {
+        return btn.dataset.index === itemIndex;
+      });
+      console.log(btns);
+      console.log(btnIndex);
+
       e.path[1].remove();
-      initialState[listIndex].items.splice(itemIndex, 1);
+      initialState[listIndex].items.splice(btnIndex, 1);
       localStorage.setItem('items', JSON.stringify(initialState));
     }
 
@@ -159,21 +157,21 @@
       el.addEventListener('submit', addItem);
     });
 
-    function reRender() {
-      populateLists(initialState);
-      itemsList = [...document.querySelectorAll('.list__items')];
-      itemsList.forEach((el) => {
-        el.addEventListener('click', toggleDone);
-        el.addEventListener('click', removeItem);
-      });
-      addItems = [...document.querySelectorAll('.add-items')];
-      addItems.forEach((el) => {
-        el.addEventListener('submit', addItem);
-      });
-    }
+    // function reRender() {
+    //   populateLists(initialState);
+    //   itemsList = [...document.querySelectorAll('.list__items')];
+    //   itemsList.forEach((el) => {
+    //     el.addEventListener('click', toggleDone);
+    //     el.addEventListener('click', removeItem);
+    //   });
+    //   addItems = [...document.querySelectorAll('.add-items')];
+    //   addItems.forEach((el) => {
+    //     el.addEventListener('submit', addItem);
+    //   });
+    // }
 
-  // </script>
-<script>
+  </script>
+  <script>
     FonAwesomeConfig = {
       autoReplaceSvg: 'nest'
     }
