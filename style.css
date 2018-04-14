@@ -1,15 +1,18 @@
 /*
   custom css variables
 */
-
 :root {
-  --heading-color: #585858;
+  --bg-color: #efe9d4;
+  --heading-color: #6d6a64;
   --white: white;
-  --gray: #eaeaea;
-  --note-color-orange: #dcb368;
-  --note-color-red: #de7a68;
+  --dark: #5d5555;
+  --checked: #7d7474;
+  --note-color-red: #e67a7a;
+  --note-color-orange: #ecbc64;
+  --note-color-yellow: #e6e46c;
+  --note-color-green: #75df75;
   --note-color-blue: #68dcdc;
-  --bg-color: #e4d8cd;
+  --note-color-purple: #c675df;
   --font-cursive: 'Indie Flower', cursive;
 }
 
@@ -32,10 +35,13 @@ body {
 header h1 {
   font-size: 4em;
   color: var(--heading-color);
+  color: #60605f;
   text-shadow: 2px 2px 2px #b1b1b1;
+  /* font-family: arial; */
+  text-transform: uppercase;
 }
 
-.wrapper {
+.lists-container {
   flex-basis: 100%;
   display: flex;
   justify-content: center;
@@ -43,53 +49,130 @@ header h1 {
 }
 
 .list {
-  background-color: var(--note-color-orange);
-  box-shadow: 5px 5px 3px 0px #a09f9f;
+  box-shadow: 2px 2px 1px 0px #a09f9f;
   margin-right: 20px;
-  padding: 15px;
+  padding: 20px;
   width: 250px;
   display: flex;
   flex-wrap: wrap;
+  position: relative;
+  border-radius: 4px;
 }
 
-.list-header {
+
+.list--red {
+  background-color: var(--note-color-red);
+}
+.list--orange {
+  background-color: var(--note-color-orange);
+}
+.list--yellow {
+  background-color: var(--note-color-yellow);
+}
+.list--green {
+  background-color: var(--note-color-green);
+}
+.list--blue {
+  background-color: var(--note-color-blue);
+}
+.list--purple {
+  background-color: var(--note-color-purple);
+}
+
+.list-options {
+  opacity: 0;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.list-options:hover {
+  opacity: 1;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+svg {
+  color: var(--heading-color);
+}
+
+svg:hover {
+  color: var(--dark);
+}
+
+.list__header {
   color: var(--heading-color);
   width: 100%;
   text-align: center;
 }
 
-.list-header h2 {
+.list__title {
   margin-bottom: 10px;
+  color: var(--dark);
 }
 
-.list-items {
+.list__items {
+  min-height: 50px;
   color: var(--heading-color);
   width: 100%;
   margin-top: 10px;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
 }
 
-.list-items div {
+.list__item {
+  padding: 0;
+  padding-left: 10px;
   font-size: 1.4em;
   flex-basis: 100%;
-  padding: 2px;
+  cursor: pointer;
+  position: relative;
+  list-style-type: none;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.list-items div:hover {
-  color: var(--gray);
+.list__item:hover {
+  background: rgba(60, 60, 60, .1);
+
 }
 
-.input-container {
+.list__items div span{
+  font-size: .8em;
+  opacity: 0;
+}
+.list__items div span:hover{
+  opacity: 1;
+}
+
+.list__item .checked, .list__item .checked:hover {
+  /* color: var(--checked); */
+  color: rgba(0, 0, 0, .2);
+  text-decoration: line-through;
+}
+
+.list__items div:hover {
+  color: var(--dark);
+}
+
+.list__input-container {
+  /* border-radius: 4px; */
   display: flex;
 }
 
-.list-input {
+.list__input {
   box-sizing: border-box;
   outline: none;
   font-size: 1.2em;
   font-family: var(--font-cursive);
-  width: 80%;
+  width: 78%;
+  margin-right: 2%;
+  border-radius: 4px;
   padding: 5px 5px 5px 10px;
   border: 0;
   background: rgba(60, 60, 60, .1);
@@ -100,14 +183,39 @@ header h1 {
   color: rgb(60, 60, 60);
 }
 
-.add-btn {
-  background-color: var(--heading-color);
-  color: var(--gray);
+.list__input-add-btn {
+  border-radius: 4px;
+
+  background-color: rgba(60, 60, 60, .1);
+  color: var(--dark);
+  /*border-left: 2px solid var(--dark);*/
   font-size: 1.2em;
   padding: 5px;
   flex-grow: 1;
+  outline: none;
+  border: none;
 }
 
-.add-btn:hover {
+.list__item-item-text {
+  flex-grow: 1;
+}
+.list__item-item-text--done {
+  text-decoration: line-through;
+  color: rgba(0, 0, 0, .2);
+}
+.list__item-delete-btn {
+  text-decoration: none;
+  flex-basis: 10%;
+  /* padding-top: 10px; */
+  text-align: center;
+  height: 100%;
+}
+
+.list__item-delete-btn:hover {
+  background-color: rgba(60, 60, 60, .1);
+}
+
+.list__input-add-btn:hover {
+  background: rgba(60, 60, 60, .2);
   cursor: pointer;
 }

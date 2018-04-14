@@ -1,122 +1,162 @@
-// global variables for this file
-let TODOS_DATA = [];
-let EDIT_MODE = false;
-let ACTIVE_INPUT = false;
-
-// determine if localStorage is already storing data
-(localStorage['todos'])
-  ? loadFromLocalStorage()
-  : loadSeedData();
-
-function loadFromLocalStorage() {
-  TODOS_DATA = JSON.parse(localStorage['todos']);
-}
-
-function loadSeedData() {
-  TODOS_DATA.push({name: 'This Week', color: 'red', todos: ['clean room', 'exercise']});
-  TODOS_DATA.push({name: 'Today', color: 'orange', todos: ['study']});
-}
-
-function addTodo(value, index) {
-  // modify data structure for later
-  TODOS_DATA[index].todos.push(value);
-
-  // manipulate DOM
-  let todo = document.createElement('div');
-  todo.textContent = value;
-  todo.addEventListener('click', e => removeTodo(index, e.currentTarget));
-  LIST_ITEMS[index].appendChild(todo);
-
-  // update local storage
-  updateStorage();
-}
-
-function checkOffTodo(todo) {
-  // TODO: its gonna involve storing todos as another array of todo objects
-  // each todo will have name, priority, and checked
-}
-
-function removeTodo(listIndex, todo) {
-  // modify data structure for later
-  let removeIndex = TODOS_DATA[listIndex].todos.findIndex((element) =>
-    element === todo.textContent);
-  TODOS_DATA[listIndex].todos.splice(removeIndex, 1);
-
-  // manipulate DOM
-  todo.remove();
-
-  // update local storage
-  updateStorage();
-}
-
-function updateStorage() {
-  localStorage.setItem('todos', JSON.stringify(TODOS_DATA));
-  console.log('TODOS_DATA is now', TODOS_DATA);
-}
-
-function addLists() {
-  const WRAPPER = document.querySelector('.wrapper');
-
-  TODOS_DATA.forEach(list => {
-    let listItems = ``;
-    list.todos.forEach(listItem => listItems += `<div>${listItem}</div>`);
-
-    let listTemplate = `
-      <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
-        <div class="list-header">
-          <h2>${list.name}</h2>
-          <div class="input-container" style="display:${EDIT_MODE ? 'flex' : 'none'}">
-            <input class='list-input' type="text" placeholder="todo...">
-            <div class="add-btn">+</div>
-          </div>
-        </div>
-        <div class="list-items">
-          ${listItems}
-        </div>
-      </div>`;
-
-    WRAPPER.innerHTML += listTemplate;
-  });
-
-}
-
-addLists();
-
-// variables for event listeners
-let INPUT_CONTAINERS = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
-let LIST_INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
-let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
-
-// toggle edit mode
-window.addEventListener('keydown', e => {
-  if (!ACTIVE_INPUT && e.key === 'e') {
-    EDIT_MODE = !EDIT_MODE;
-    INPUT_CONTAINERS.forEach(input =>
-      input.style.display = EDIT_MODE ? 'flex' : 'none');
+/*
+  setup
+*/
+const STATE = JSON.parse(localStorage.getItem('items')) || [
+  {
+    title: 'Near Future',
+    color: 'red',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'This Week',
+    color: 'orange',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Today',
+    color: 'green',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Daily',
+    color: 'blue',
+    items: [ { done: false, text: 'Do the one thing' } ]
   }
+];
+
+const listsContainer = document.querySelector('.lists-container');
+renderLists(STATE);
+
+[...document.querySelectorAll('.list__items')].forEach((el) => {
+  el.addEventListener('click', toggleItem);
+  el.addEventListener('click', removeItem);
+});
+[...document.querySelectorAll('.add-items')].forEach((el) => {
+  el.addEventListener('submit', addItem);
 });
 
 // clear local storage
 window.addEventListener('keydown', e => {
-  if (e.key === 'c')
-    localStorage.clear();
+  if (e.key === '-') localStorage.removeItem('items');
 });
 
-// input event listeners
-LIST_INPUTS.forEach((input, index) => {
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      addTodo(input.value, index);
-      input.value = '';
-    }
-  });
-  input.addEventListener('focusin', e => ACTIVE_INPUT = true);
-  input.addEventListener('focusout', e => ACTIVE_INPUT = false);
-});
 
-// todo event listeners
-LIST_ITEMS.forEach((list, listIndex) => {
-  let children = Array.prototype.slice.call(list.children);
-  children.forEach((child, childIndex) =>
-    child.addEventListener('click', () => removeTodo(listIndex, child)));
-});
+/*
+  functions
+*/
+function renderLists(lists) {
+  listsContainer.innerHTML = lists.map((list, i) => {
+    // TODO: make sure ids are assigned properly
+    return (`
+      <div class="list list--${list.color}" data-list-id=${i}>
+        <div class="list__header">
+          <h2 class="list__title">${list.title}</h2>
+          <form class="add-items list__input-container">
+            <input class="list__input" type="text" name="item" autofocus tabindex=${i+1} placeholder="todo...">
+            <button class="list__input-add-btn" type="submit">+</button>
+          </form>
+        </div>
+        <ul class="list__items">
+          ${populateList(list.items)}
+        </ul>
+      </div>
+    `);
+  }).join('');
+}
+
+function populateList(items) {
+  return items.map((item, i) =>
+    (`
+      <li class="list__item" data-item-id=${i}>
+        <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}">${item.text}</span>
+        <span class="list__item-delete-btn">X</span>
+      </li>
+    `)).join('');
+}
+
+function getAvailableId(list) {
+  let takenIds = [];
+  list.forEach((item) => { takenIds.push(item.dataset.itemId); });
+
+  for (let i = 0; i < 100; i++) {
+    if (!takenIds.includes(String(i))) return i;
+  }
+  return -1; // can't find an untaken id
+}
+
+function getIndex(id, list) {
+  return list.findIndex((item) => item.dataset.itemId === id);
+}
+
+function updateStorage() {
+  localStorage.setItem('items', JSON.stringify(STATE));
+}
+
+function addItem(e) {
+  e.preventDefault(); // don't refresh page
+
+  const thisInput = this.querySelector('.list__input');
+  const thisList = e.path[2];
+  const listId = thisList.dataset.listId;
+
+  const thisListItems = thisList.querySelector(`.list__items`);
+  const theseItems = [...thisList.querySelectorAll(`.list__item`)];
+  const id = getAvailableId(theseItems);
+
+  const item = {
+    text: thisInput.value,
+    done: false
+  };
+
+  // manipulate DOM
+  thisListItems.innerHTML += (`
+    <li class="list__item" data-id=${id}>
+      <span class="list__item-item-text">${item.text}</span>
+      <span class="list__item-delete-btn">X</span>
+    </li>
+  `);
+  thisInput.value = '';
+
+  // manipulate data
+  STATE[listId].items.push(item);
+  updateStorage();
+}
+
+function toggleItem(e) {
+  // skip this unless it's the item text
+  if (!e.target.matches('.list__item-item-text')) return;
+
+  const itemId = e.path[1].dataset.itemId;
+  const thisList = e.path[3];
+  const listId = thisList.dataset.listId;
+
+  const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
+
+  // manipulate DOM
+  e.target.classList.toggle('list__item-item-text--done');
+
+  // manipulate data
+  const value = STATE[listId].items[itemIndex].done;
+  STATE[listId].items[itemIndex].done = !value;
+  updateStorage();
+}
+
+function removeItem(e) {
+  // skip this unless it's the delete button
+  if (!e.target.matches('.list__item-delete-btn')) return;
+
+  const thisItem = e.path[1];
+  const itemId = thisItem.dataset.itemId;
+
+  const thisList = e.path[3];
+  const listId = thisList.dataset.listId;
+
+  const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
+
+  // manipulate DOM
+  thisItem.remove();
+
+  // manipulate data
+  STATE[listId].items.splice(itemIndex, 1);
+  updateStorage();
+}
