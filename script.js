@@ -3,13 +3,18 @@
 */
 const STATE = JSON.parse(localStorage.getItem('items')) || [
   {
-    title: 'This Week',
+    title: 'Near Future',
     color: 'red',
     items: [ { done: false, text: 'Do the one thing' } ]
   },
   {
-    title: 'Today',
+    title: 'This Week',
     color: 'orange',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Today',
+    color: 'green',
     items: [ { done: false, text: 'Do the one thing' } ]
   },
   {
@@ -28,6 +33,11 @@ renderLists(STATE);
 });
 [...document.querySelectorAll('.add-items')].forEach((el) => {
   el.addEventListener('submit', addItem);
+});
+
+// clear local storage
+window.addEventListener('keydown', e => {
+  if (e.key === '-') localStorage.removeItem('items');
 });
 
 
