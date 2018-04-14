@@ -1,192 +1,143 @@
-// global variables for this file
-TODOS_DATA = [];
-let EDIT_MODE = false;
-let ACTIVE_INPUT = false;
-
-const todoObject = (value, priority = 1) => ({name: value, priority: priority, checked: false});
 
 
-// determine if localStorage is already storing data
-(localStorage['todos_dev'])
-  ? loadFromLocalStorage()
-  : loadSeedData();
+function addItem(e) {
+  console.log(e);
+  e.preventDefault();
+  const text = (this.querySelector('[name=item]')).value;
+  const item = {
+    text,
+    done: false
+  };
 
-console.log(TODOS_DATA);
+  const listIndex = e.target.dataset.listIndex;
 
-function loadFromLocalStorage() {
-  TODOS_DATA = JSON.parse(localStorage['todos_dev']);
+  initialState[listIndex].items.push(item);
+
+  let ll = document.querySelectorAll(`.list__items`);
+  l = ll[listIndex];
+  let len = initialState[listIndex].items.length;
+  l.innerHTML += (`
+    <li class="list__item" data-index=${len}>
+      <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${len}>${item.text}</span>
+      <span class="list__item-delete-btn" data-index=${len}>X</span>
+    </li>
+  `);
+  (this.querySelector('[name=item]')).value = '';
+
+  localStorage.setItem('items', JSON.stringify(initialState));
+  // (this.querySelector('[name=item]')).focus();
 }
 
-function loadSeedData() {
-  TODOS_DATA.push({
-    name: 'This Week',
+const initialState = JSON.parse(localStorage.getItem('items')) || [
+  {
+    title: 'This Week',
     color: 'red',
-    todos: [todoObject('workout'), todoObject('clean')]
-  });
-  TODOS_DATA.push({
-    name: 'Today',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Today',
     color: 'orange',
-    todos: [todoObject('clean')]
-  });
-}
-
-const listModel = {
-  name: 'name',
-  color: 'red',
-  todos: [todoObject('clean')],
-
-
-};
-
-
-function addTodo(value, index) {
-  // modify data structure for later
-  TODOS_DATA[index].todos.push(todoObject(value));
-
-  // manipulate DOM
-  let todo = document.createElement('div');
-  todo.textContent = value;
-  todo.addEventListener('click', e => {
-    if (EDIT_MODE)
-      removeTodo(index, e.currentTarget)
-    else
-      toggleTodo(index, e.currentTarget)
-  });
-  LIST_ITEMS[index].appendChild(todo);
-
-  // update local storage
-  updateStorage();
-}
-
-function toggleTodo(listIndex, todo) {
-
-  // modify data structure for later
-  let toggleIndex = TODOS_DATA[listIndex].todos.findIndex((element) => element.name === todo.textContent);
-  let target = TODOS_DATA[listIndex].todos[toggleIndex];
-  target.checked = !target.checked;
-
-  // manipulate DOM
-  todo.classList.toggle('checked');
-
-  // update local storage
-  updateStorage();
-}
-
-function removeTodo(listIndex, todo) {
-  // modify data structure for later
-  let removeIndex = TODOS_DATA[listIndex].todos.findIndex((element) => element.name === todo.textContent);
-  TODOS_DATA[listIndex].todos.splice(removeIndex, 1);
-
-  // manipulate DOM
-  todo.remove();
-
-  // update local storage
-  updateStorage();
-}
-
-function updateStorage() {
-  localStorage.setItem('todos_dev', JSON.stringify(TODOS_DATA));
-  console.log('TODOS_DATA is now', TODOS_DATA);
-}
-
-function addLists() {
-  const WRAPPER = document.querySelector('.wrapper');
-
-  TODOS_DATA.forEach(list => {
-    let listItems = ``;
-    list.todos.forEach(listItem => listItems +=
-      `<div class="${listItem.checked ? 'checked' : ''}">
-        ${listItem.name}
-        <span>
-          <i class="fas fa-edit"></i>
-          <i class="fas fa-trash-alt"></i>
-        </span>
-      </div>`);
-
-    let listTemplate = `
-      <div class="list" id="list-1" style="background-color:var(--note-color-${list.color})">
-        <div class="list-header">
-          <div class="list-options">
-            <i class="fas fa-plus"></i>
-            <i class="fas fa-sync-alt"></i>
-            <i class="fas fa-trash-alt"></i>
-          </div>
-          <h2>${list.name}</h2>
-          <div class="input-container" style="display:${EDIT_MODE
-      ? 'flex'
-      : 'none'}">
-            <input class='list-input' type="text" placeholder="todo...">
-            <div class="add-btn"> <i class="fas fa-plus"></i> </div>
-          </div>
-        </div>
-        <div class="list-items">
-          ${listItems}
-        </div>
-      </div>`;
-
-    WRAPPER.innerHTML += listTemplate;
-  });
-
-}
-
-addLists();
-
-// variables for event listeners
-let INPUT_CONTAINERS = Array.prototype.slice.call(document.querySelectorAll('.input-container'));
-let LIST_INPUTS = Array.prototype.slice.call(document.querySelectorAll('.list-input'));
-let LIST_ITEMS = Array.prototype.slice.call(document.querySelectorAll('.list-items'));
-
-let ADD_BUTTONS = Array.prototype.slice.call(document.querySelectorAll('.list-options .fa-plus'));
-
-ADD_BUTTONS.forEach((btn, index) => {
-  btn.addEventListener('click', e => {
-    console.log('clicked');
-    EDIT_MODE = !EDIT_MODE;
-    INPUT_CONTAINERS.forEach(
-      input => input.style.display = EDIT_MODE
-      ? 'flex'
-      : 'none');
-  });
-});
-console.log(ADD_BUTTONS);
-
-// toggle edit mode
-window.addEventListener('keydown', e => {
-  if (!ACTIVE_INPUT && e.key === 'e') {
-    EDIT_MODE = !EDIT_MODE;
-    INPUT_CONTAINERS.forEach(
-      input => input.style.display = EDIT_MODE
-      ? 'flex'
-      : 'none');
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Daily',
+    color: 'blue',
+    items: [ { done: false, text: 'Do the one thing' } ]
   }
-});
+];
 
-// clear local storage
-window.addEventListener('keydown', e => {
-  if (e.key === 'c')
-    localStorage.removeItem('todos_dev');
-  }
-);
+function populateList(items) {
+  return items.map((item, i) => {
+    return `
+      <li class="list__item" data-index=${i}>
+        <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${i}>${item.text}</span>
+        <span class="list__item-delete-btn" data-index=${i}>X</span>
+      </li>
+    `;
+  }).join('');
+}
 
-// input event listeners
-LIST_INPUTS.forEach((input, index) => {
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      addTodo(input.value, index);
-      input.value = '';
-    }
+
+function toggleDone(e) {
+  if (!e.target.matches('.list__item-item-text')) return; // skip this unless it's not a span
+  e.preventDefault();
+  const el = e.target;
+  const itemIndex = el.dataset.index;
+  const listIndex = e.path[2].dataset.listIndex;
+
+  e.target.classList.toggle('list__item-item-text--done');
+  // flip the boolean value
+  const value = initialState[listIndex].items[itemIndex].done;
+  initialState[listIndex].items[itemIndex].done = !value;
+  localStorage.setItem('items', JSON.stringify(initialState));
+}
+
+function removeItem(e) {
+  if (!e.target.matches('.list__item-delete-btn')) return; // skip this unless it's a span
+  console.log(e);
+
+  e.preventDefault();
+  const el = e.target;
+  const itemIndex = el.dataset.index;
+  const listIndex = e.path[2].dataset.listIndex;
+
+  let btns = [...e.path[2].querySelectorAll(`.list__item-delete-btn`)];
+  let btnIndex = btns.findIndex((btn) => {
+    return btn.dataset.index === itemIndex;
   });
-  input.addEventListener('focusin', e => ACTIVE_INPUT = true);
-  input.addEventListener('focusout', e => ACTIVE_INPUT = false);
+  console.log(btns);
+  console.log(btnIndex);
+
+  e.path[1].remove();
+  initialState[listIndex].items.splice(btnIndex, 1);
+  localStorage.setItem('items', JSON.stringify(initialState));
+}
+
+function populateLists(lists = []) {
+  listsContainer.innerHTML = lists.map((list, i) => {
+    return (`
+      <div class="list list--${list.color}" data-index=${i}>
+        <div class="list__header">
+          <h2 class="list__title">${list.title}</h2>
+          <form class="add-items list__input-container" data-list-index=${i}>
+            <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
+            <button class="list__input-add-btn" type="submit">+</button>
+          </form>
+        </div>
+        <ul class="list__items" data-list-index=${i}>
+          ${populateList(list.items)}
+        </ul>
+      </div>
+    `);
+  }).join('');
+}
+
+const listsContainer = document.querySelector('.lists-container');
+
+populateLists(initialState);
+
+let itemsList = [];
+itemsList = [...document.querySelectorAll('.list__items')];
+itemsList.forEach((el) => {
+  el.addEventListener('click', toggleDone);
+  el.addEventListener('click', removeItem);
 });
 
-// todo event listeners
-LIST_ITEMS.forEach((list, listIndex) => {
-  let children = Array.prototype.slice.call(list.children);
-  children.forEach((child, childIndex) => child.addEventListener('click', () => {
-    if (EDIT_MODE)
-      removeTodo(listIndex, child)
-    else
-      toggleTodo(listIndex, child)
-  }));
+let addItems = [];
+addItems = [...document.querySelectorAll('.add-items')];
+addItems.forEach((el) => {
+  el.addEventListener('submit', addItem);
 });
+
+// function reRender() {
+//   populateLists(initialState);
+//   itemsList = [...document.querySelectorAll('.list__items')];
+//   itemsList.forEach((el) => {
+//     el.addEventListener('click', toggleDone);
+//     el.addEventListener('click', removeItem);
+//   });
+//   addItems = [...document.querySelectorAll('.add-items')];
+//   addItems.forEach((el) => {
+//     el.addEventListener('submit', addItem);
+//   });
+// }
