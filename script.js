@@ -1,4 +1,75 @@
+/*
+  setup
+*/
+const initialState = JSON.parse(localStorage.getItem('items')) || [
+  {
+    title: 'This Week',
+    color: 'red',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Today',
+    color: 'orange',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  },
+  {
+    title: 'Daily',
+    color: 'blue',
+    items: [ { done: false, text: 'Do the one thing' } ]
+  }
+];
 
+
+const listsContainer = document.querySelector('.lists-container');
+
+populateLists(initialState);
+
+const itemsList = [...document.querySelectorAll('.list__items')];
+itemsList.forEach((el) => {
+  el.addEventListener('click', toggleDone);
+  el.addEventListener('click', removeItem);
+});
+
+const addItems = [...document.querySelectorAll('.add-items')];
+addItems.forEach((el) => {
+  el.addEventListener('submit', addItem);
+});
+
+
+/*
+  functions
+*/
+function populateLists(lists = []) {
+  listsContainer.innerHTML = lists.map((list, i) => {
+    return (`
+      <div class="list list--${list.color}" data-index=${i}>
+        <div class="list__header">
+          <h2 class="list__title">${list.title}</h2>
+          <form class="add-items list__input-container" data-list-index=${i}>
+            <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
+            <button class="list__input-add-btn" type="submit">+</button>
+          </form>
+        </div>
+        <ul class="list__items" data-list-index=${i}>
+          ${populateList(list.items)}
+        </ul>
+      </div>
+    `);
+  }).join('');
+}
+
+function populateList(items) {
+  return items.map((item, i) => {
+    return `
+      <li class="list__item" data-index=${i}>
+        <span class="list__item-item-text ${item.done
+          ? 'list__item-item-text--done'
+          : ''}" data-index=${i}>${item.text}</span>
+        <span class="list__item-delete-btn" data-index=${i}>X</span>
+      </li>
+    `;
+  }).join('');
+}
 
 function addItem(e) {
   console.log(e);
@@ -27,36 +98,6 @@ function addItem(e) {
   localStorage.setItem('items', JSON.stringify(initialState));
   // (this.querySelector('[name=item]')).focus();
 }
-
-const initialState = JSON.parse(localStorage.getItem('items')) || [
-  {
-    title: 'This Week',
-    color: 'red',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  },
-  {
-    title: 'Today',
-    color: 'orange',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  },
-  {
-    title: 'Daily',
-    color: 'blue',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  }
-];
-
-function populateList(items) {
-  return items.map((item, i) => {
-    return `
-      <li class="list__item" data-index=${i}>
-        <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${i}>${item.text}</span>
-        <span class="list__item-delete-btn" data-index=${i}>X</span>
-      </li>
-    `;
-  }).join('');
-}
-
 
 function toggleDone(e) {
   if (!e.target.matches('.list__item-item-text')) return; // skip this unless it's not a span
@@ -92,52 +133,3 @@ function removeItem(e) {
   initialState[listIndex].items.splice(btnIndex, 1);
   localStorage.setItem('items', JSON.stringify(initialState));
 }
-
-function populateLists(lists = []) {
-  listsContainer.innerHTML = lists.map((list, i) => {
-    return (`
-      <div class="list list--${list.color}" data-index=${i}>
-        <div class="list__header">
-          <h2 class="list__title">${list.title}</h2>
-          <form class="add-items list__input-container" data-list-index=${i}>
-            <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
-            <button class="list__input-add-btn" type="submit">+</button>
-          </form>
-        </div>
-        <ul class="list__items" data-list-index=${i}>
-          ${populateList(list.items)}
-        </ul>
-      </div>
-    `);
-  }).join('');
-}
-
-const listsContainer = document.querySelector('.lists-container');
-
-populateLists(initialState);
-
-let itemsList = [];
-itemsList = [...document.querySelectorAll('.list__items')];
-itemsList.forEach((el) => {
-  el.addEventListener('click', toggleDone);
-  el.addEventListener('click', removeItem);
-});
-
-let addItems = [];
-addItems = [...document.querySelectorAll('.add-items')];
-addItems.forEach((el) => {
-  el.addEventListener('submit', addItem);
-});
-
-// function reRender() {
-//   populateLists(initialState);
-//   itemsList = [...document.querySelectorAll('.list__items')];
-//   itemsList.forEach((el) => {
-//     el.addEventListener('click', toggleDone);
-//     el.addEventListener('click', removeItem);
-//   });
-//   addItems = [...document.querySelectorAll('.add-items')];
-//   addItems.forEach((el) => {
-//     el.addEventListener('submit', addItem);
-//   });
-// }
