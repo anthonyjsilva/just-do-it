@@ -1,7 +1,7 @@
 /*
   setup
 */
-const initialState = JSON.parse(localStorage.getItem('items')) || [
+const STATE = JSON.parse(localStorage.getItem('items')) || [
   {
     title: 'This Week',
     color: 'red',
@@ -19,19 +19,14 @@ const initialState = JSON.parse(localStorage.getItem('items')) || [
   }
 ];
 
-
 const listsContainer = document.querySelector('.lists-container');
+renderLists(STATE);
 
-renderLists(initialState);
-
-const itemsList = [...document.querySelectorAll('.list__items')];
-itemsList.forEach((el) => {
-  el.addEventListener('click', toggleDone);
+[...document.querySelectorAll('.list__items')].forEach((el) => {
+  el.addEventListener('click', toggleItem);
   el.addEventListener('click', removeItem);
 });
-
-const addItems = [...document.querySelectorAll('.add-items')];
-addItems.forEach((el) => {
+[...document.querySelectorAll('.add-items')].forEach((el) => {
   el.addEventListener('submit', addItem);
 });
 
@@ -41,16 +36,17 @@ addItems.forEach((el) => {
 */
 function renderLists(lists) {
   listsContainer.innerHTML = lists.map((list, i) => {
+    // TODO: make sure ids are assigned properly
     return (`
-      <div class="list list--${list.color}" data-list-index=${i}>
+      <div class="list list--${list.color}" data-list-id=${i}>
         <div class="list__header">
           <h2 class="list__title">${list.title}</h2>
-          <form class="add-items list__input-container" data-list-index=${i}>
-            <input class="list__input" type="text" name="item" autofocus placeholder="todo...">
+          <form class="add-items list__input-container">
+            <input class="list__input" type="text" name="item" autofocus tabindex=${i+1} placeholder="todo...">
             <button class="list__input-add-btn" type="submit">+</button>
           </form>
         </div>
-        <ul class="list__items" data-list-index=${i}>
+        <ul class="list__items">
           ${populateList(list.items)}
         </ul>
       </div>
@@ -59,78 +55,98 @@ function renderLists(lists) {
 }
 
 function populateList(items) {
-  return items.map((item, i) => {
-    return `
-      <li class="list__item" data-index=${i}>
-        <span class="list__item-item-text ${item.done
-          ? 'list__item-item-text--done'
-          : ''}" data-index=${i}>${item.text}</span>
-        <span class="list__item-delete-btn" data-index=${i}>X</span>
+  return items.map((item, i) =>
+    (`
+      <li class="list__item" data-item-id=${i}>
+        <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}">${item.text}</span>
+        <span class="list__item-delete-btn">X</span>
       </li>
-    `;
-  }).join('');
+    `)).join('');
+}
+
+function getAvailableId(list) {
+  let takenIds = [];
+  list.forEach((item) => { takenIds.push(item.dataset.itemId); });
+
+  for (let i = 0; i < 100; i++) {
+    if (!takenIds.includes(String(i))) return i;
+  }
+  return -1; // can't find an untaken id
+}
+
+function getIndex(id, list) {
+  return list.findIndex((item) => item.dataset.itemId === id);
+}
+
+function updateStorage() {
+  localStorage.setItem('items', JSON.stringify(STATE));
 }
 
 function addItem(e) {
-  console.log(e);
-  e.preventDefault();
+  e.preventDefault(); // don't refresh page
+
   const thisInput = this.querySelector('.list__input');
+  const thisList = e.path[2];
+  const listId = thisList.dataset.listId;
+
+  const thisListItems = thisList.querySelector(`.list__items`);
+  const theseItems = [...thisList.querySelectorAll(`.list__item`)];
+  const id = getAvailableId(theseItems);
+
   const item = {
     text: thisInput.value,
     done: false
   };
 
-  const listIndex = e.target.dataset.listIndex;
-
   // manipulate DOM
-  let allListItems = document.querySelectorAll(`.list__items`);
-  console.log(allListItems);
-  let thisListItems = allListItems[listIndex];
-  let len = initialState[listIndex].items.length;
   thisListItems.innerHTML += (`
-    <li class="list__item" data-index=${len}>
-      <span class="list__item-item-text" data-index=${len}>${item.text}</span>
-      <span class="list__item-delete-btn" data-index=${len}>X</span>
+    <li class="list__item" data-id=${id}>
+      <span class="list__item-item-text">${item.text}</span>
+      <span class="list__item-delete-btn">X</span>
     </li>
   `);
   thisInput.value = '';
 
   // manipulate data
-  initialState[listIndex].items.push(item);
-  localStorage.setItem('items', JSON.stringify(initialState));
+  STATE[listId].items.push(item);
+  updateStorage();
 }
 
-function toggleDone(e) {
+function toggleItem(e) {
   // skip this unless it's the item text
   if (!e.target.matches('.list__item-item-text')) return;
 
-  const el = e.target;
-  const itemIndex = el.dataset.index;
-  const listIndex = e.path[2].dataset.listIndex;
+  const itemId = e.path[1].dataset.itemId;
+  const thisList = e.path[3];
+  const listId = thisList.dataset.listId;
 
+  const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
+
+  // manipulate DOM
   e.target.classList.toggle('list__item-item-text--done');
-  // flip the boolean value
-  const value = initialState[listIndex].items[itemIndex].done;
-  initialState[listIndex].items[itemIndex].done = !value;
-  localStorage.setItem('items', JSON.stringify(initialState));
+
+  // manipulate data
+  const value = STATE[listId].items[itemIndex].done;
+  STATE[listId].items[itemIndex].done = !value;
+  updateStorage();
 }
 
 function removeItem(e) {
   // skip this unless it's the delete button
   if (!e.target.matches('.list__item-delete-btn')) return;
-  console.log(e);
-  const el = e.target;
-  const itemIndex = el.dataset.index;
-  const listIndex = e.path[2].dataset.listIndex;
 
-  let btns = [...e.path[2].querySelectorAll(`.list__item-delete-btn`)];
-  let btnIndex = btns.findIndex((btn) => {
-    return btn.dataset.index === itemIndex;
-  });
-  console.log(btns);
-  console.log(btnIndex);
+  const thisItem = e.path[1];
+  const itemId = thisItem.dataset.itemId;
 
-  e.path[1].remove();
-  initialState[listIndex].items.splice(btnIndex, 1);
-  localStorage.setItem('items', JSON.stringify(initialState));
+  const thisList = e.path[3];
+  const listId = thisList.dataset.listId;
+
+  const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
+
+  // manipulate DOM
+  thisItem.remove();
+
+  // manipulate data
+  STATE[listId].items.splice(itemIndex, 1);
+  updateStorage();
 }
