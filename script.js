@@ -22,7 +22,7 @@ const initialState = JSON.parse(localStorage.getItem('items')) || [
 
 const listsContainer = document.querySelector('.lists-container');
 
-populateLists(initialState);
+renderLists(initialState);
 
 const itemsList = [...document.querySelectorAll('.list__items')];
 itemsList.forEach((el) => {
@@ -39,10 +39,10 @@ addItems.forEach((el) => {
 /*
   functions
 */
-function populateLists(lists = []) {
+function renderLists(lists) {
   listsContainer.innerHTML = lists.map((list, i) => {
     return (`
-      <div class="list list--${list.color}" data-index=${i}>
+      <div class="list list--${list.color}" data-list-index=${i}>
         <div class="list__header">
           <h2 class="list__title">${list.title}</h2>
           <form class="add-items list__input-container" data-list-index=${i}>
@@ -74,34 +74,36 @@ function populateList(items) {
 function addItem(e) {
   console.log(e);
   e.preventDefault();
-  const text = (this.querySelector('[name=item]')).value;
+  const thisInput = this.querySelector('.list__input');
   const item = {
-    text,
+    text: thisInput.value,
     done: false
   };
 
   const listIndex = e.target.dataset.listIndex;
 
-  initialState[listIndex].items.push(item);
-
-  let ll = document.querySelectorAll(`.list__items`);
-  l = ll[listIndex];
+  // manipulate DOM
+  let allListItems = document.querySelectorAll(`.list__items`);
+  console.log(allListItems);
+  let thisListItems = allListItems[listIndex];
   let len = initialState[listIndex].items.length;
-  l.innerHTML += (`
+  thisListItems.innerHTML += (`
     <li class="list__item" data-index=${len}>
-      <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}" data-index=${len}>${item.text}</span>
+      <span class="list__item-item-text" data-index=${len}>${item.text}</span>
       <span class="list__item-delete-btn" data-index=${len}>X</span>
     </li>
   `);
-  (this.querySelector('[name=item]')).value = '';
+  thisInput.value = '';
 
+  // manipulate data
+  initialState[listIndex].items.push(item);
   localStorage.setItem('items', JSON.stringify(initialState));
-  // (this.querySelector('[name=item]')).focus();
 }
 
 function toggleDone(e) {
-  if (!e.target.matches('.list__item-item-text')) return; // skip this unless it's not a span
-  e.preventDefault();
+  // skip this unless it's the item text
+  if (!e.target.matches('.list__item-item-text')) return;
+
   const el = e.target;
   const itemIndex = el.dataset.index;
   const listIndex = e.path[2].dataset.listIndex;
@@ -114,10 +116,9 @@ function toggleDone(e) {
 }
 
 function removeItem(e) {
-  if (!e.target.matches('.list__item-delete-btn')) return; // skip this unless it's a span
+  // skip this unless it's the delete button
+  if (!e.target.matches('.list__item-delete-btn')) return;
   console.log(e);
-
-  e.preventDefault();
   const el = e.target;
   const itemIndex = el.dataset.index;
   const listIndex = e.path[2].dataset.listIndex;
