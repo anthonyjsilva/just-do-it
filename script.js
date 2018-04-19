@@ -44,12 +44,21 @@ window.addEventListener('keydown', e => {
 /*
   functions
 */
+function dropDownButton() {
+
+}
+
 function renderLists(lists) {
   listsContainer.innerHTML = lists.map((list, i) => {
     // TODO: make sure ids are assigned properly
     return (`
       <div class="list list--${list.color}" data-list-id=${i}>
         <div class="list__header">
+          <i class="list__color-btn fas fa-tint">
+            <select>
+              <option value="red"></option>
+            </select>
+          </i>
           <h2 class="list__title">${list.title}</h2>
           <form class="add-items list__input-container">
             <input class="list__input" type="text" name="item" autofocus tabindex=${i+1} placeholder="todo...">
