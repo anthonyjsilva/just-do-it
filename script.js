@@ -29,6 +29,7 @@ renderLists(STATE);
 
 [...document.querySelectorAll('.list__items')].forEach((el) => {
   el.addEventListener('click', toggleItem);
+  el.addEventListener('click', editItem);
   el.addEventListener('click', removeItem);
 });
 [...document.querySelectorAll('.add-items')].forEach((el) => {
@@ -44,9 +45,6 @@ window.addEventListener('keydown', e => {
 /*
   functions
 */
-function dropDownButton() {
-
-}
 
 function renderLists(lists) {
   listsContainer.innerHTML = lists.map((list, i) => {
@@ -54,11 +52,6 @@ function renderLists(lists) {
     return (`
       <div class="list list--${list.color}" data-list-id=${i}>
         <div class="list__header">
-          <i class="list__color-btn fas fa-tint">
-            <select>
-              <option value="red"></option>
-            </select>
-          </i>
           <h2 class="list__title">${list.title}</h2>
           <form class="add-items list__input-container">
             <input class="list__input" type="text" name="item" autofocus tabindex=${i+1} placeholder="todo...">
@@ -78,6 +71,9 @@ function populateList(items) {
     (`
       <li class="list__item" data-item-id=${i}>
         <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}">${item.text}</span>
+        <span class="list__item-edit-btn">
+          <i class="list__color-btn fas fa-edit"></i>
+        </span>
         <span class="list__item-delete-btn">X</span>
       </li>
     `)).join('');
@@ -121,6 +117,9 @@ function addItem(e) {
   thisListItems.innerHTML += (`
     <li class="list__item" data-id=${id}>
       <span class="list__item-item-text">${item.text}</span>
+      <span class="list__item-edit-btn">
+        <i class="list__color-btn fas fa-edit"></i>
+      </span>
       <span class="list__item-delete-btn">X</span>
     </li>
   `);
@@ -147,6 +146,29 @@ function toggleItem(e) {
   // manipulate data
   const value = STATE[listId].items[itemIndex].done;
   STATE[listId].items[itemIndex].done = !value;
+  updateStorage();
+}
+
+function editItem(e) {
+  // skip this unless it's the item text
+  if (!e.path[2].matches('.list__item-edit-btn')) return;
+  // console.log(e);
+
+  const thisItem = e.path[3];
+  const itemId = thisItem.dataset.itemId;
+
+  const thisList = e.path[5];
+  const listId = thisList.dataset.listId;
+
+  const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
+  
+  const newText = prompt('Edit todo...');
+
+  // manipulate DOM
+  thisItem.children[0].textContent = newText;
+
+  // manipulate data
+  STATE[listId].items[itemIndex].text = newText;
   updateStorage();
 }
 
