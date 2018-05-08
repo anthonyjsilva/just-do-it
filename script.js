@@ -5,22 +5,39 @@ const STATE = JSON.parse(localStorage.getItem('items')) || [
   {
     title: 'Near Future',
     color: 'red',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  },
-  {
+    items: [
+      {
+        done: false,
+        text: 'Do the one thing'
+      }
+    ]
+  }, {
     title: 'This Week',
     color: 'orange',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  },
-  {
+    items: [
+      {
+        done: false,
+        text: 'Do the one thing'
+      }
+    ]
+  }, {
     title: 'Today',
     color: 'green',
-    items: [ { done: false, text: 'Do the one thing' } ]
-  },
-  {
+    items: [
+      {
+        done: false,
+        text: 'Do the one thing'
+      }
+    ]
+  }, {
     title: 'Daily',
     color: 'blue',
-    items: [ { done: false, text: 'Do the one thing' } ]
+    items: [
+      {
+        done: false,
+        text: 'Do the one thing'
+      }
+    ]
   }
 ];
 
@@ -38,14 +55,14 @@ renderLists(STATE);
 
 // clear local storage
 window.addEventListener('keydown', e => {
-  if (e.key === '-') localStorage.removeItem('items');
-});
-
+  if (e.key === '-')
+    localStorage.removeItem('items');
+  }
+);
 
 /*
   functions
 */
-
 function renderLists(lists) {
   listsContainer.innerHTML = lists.map((list, i) => {
     // TODO: make sure ids are assigned properly
@@ -54,7 +71,7 @@ function renderLists(lists) {
         <div class="list__header">
           <h2 class="list__title">${list.title}</h2>
           <form class="add-items list__input-container">
-            <input class="list__input" type="text" name="item" autofocus tabindex=${i+1} placeholder="todo...">
+            <input class="list__input" type="text" name="item" autofocus tabindex=${i + 1} placeholder="todo...">
             <button class="list__input-add-btn" type="submit">+</button>
           </form>
         </div>
@@ -67,13 +84,13 @@ function renderLists(lists) {
 }
 
 function populateList(items) {
-  return items.map((item, i) =>
-    (`
+  return items.map((item, i) => (
+    `
       <li class="list__item" data-item-id=${i}>
-        <span class="list__item-item-text ${item.done ? 'list__item-item-text--done' : ''}">${item.text}</span>
-        <span class="list__item-edit-btn">
-          <i class="list__color-btn fas fa-edit"></i>
-        </span>
+        <span class="list__item-item-text ${item.done
+    ? 'list__item-item-text--done'
+    : ''}">${item.text}</span>
+        <span class="list__item-edit-btn">edit</span>
         <span class="list__item-delete-btn">X</span>
       </li>
     `)).join('');
@@ -81,11 +98,14 @@ function populateList(items) {
 
 function getAvailableId(list) {
   let takenIds = [];
-  list.forEach((item) => { takenIds.push(item.dataset.itemId); });
+  list.forEach((item) => {
+    takenIds.push(item.dataset.itemId);
+  });
 
   for (let i = 0; i < 100; i++) {
-    if (!takenIds.includes(String(i))) return i;
-  }
+    if (!takenIds.includes(String(i)))
+      return i;
+    }
   return -1; // can't find an untaken id
 }
 
@@ -114,15 +134,7 @@ function addItem(e) {
   };
 
   // manipulate DOM
-  thisListItems.innerHTML += (`
-    <li class="list__item" data-id=${id}>
-      <span class="list__item-item-text">${item.text}</span>
-      <span class="list__item-edit-btn">
-        <i class="list__color-btn fas fa-edit"></i>
-      </span>
-      <span class="list__item-delete-btn">X</span>
-    </li>
-  `);
+  thisListItems.innerHTML += populateList([item]);
   thisInput.value = '';
 
   // manipulate data
@@ -132,7 +144,8 @@ function addItem(e) {
 
 function toggleItem(e) {
   // skip this unless it's the item text
-  if (!e.target.matches('.list__item-item-text')) return;
+  if (!e.target.matches('.list__item-item-text'))
+    return;
 
   const itemId = e.path[1].dataset.itemId;
   const thisList = e.path[3];
@@ -151,21 +164,24 @@ function toggleItem(e) {
 
 function editItem(e) {
   // skip this unless it's the item text
-  if (!e.path[2].matches('.list__item-edit-btn')) return;
-  // console.log(e);
+  if (!e.target.matches('.list__item-edit-btn'))
+    return;
 
-  const thisItem = e.path[3];
+  const thisItem = e.path[1];
   const itemId = thisItem.dataset.itemId;
 
-  const thisList = e.path[5];
+  let thisItemText = thisItem.children[0];
+  let thisItemTextContent = thisItemText.textContent;
+
+  const thisList = e.path[3];
   const listId = thisList.dataset.listId;
 
   const itemIndex = getIndex(itemId, [...thisList.querySelectorAll(`.list__item`)]);
-  
-  const newText = prompt('Edit todo...');
+
+  const newText = prompt('Edit todo...', thisItemTextContent) || thisItemTextContent;
 
   // manipulate DOM
-  thisItem.children[0].textContent = newText;
+  thisItemText.textContent = newText;
 
   // manipulate data
   STATE[listId].items[itemIndex].text = newText;
@@ -174,7 +190,8 @@ function editItem(e) {
 
 function removeItem(e) {
   // skip this unless it's the delete button
-  if (!e.target.matches('.list__item-delete-btn')) return;
+  if (!e.target.matches('.list__item-delete-btn'))
+    return;
 
   const thisItem = e.path[1];
   const itemId = thisItem.dataset.itemId;
