@@ -1,5 +1,6 @@
 # JUST DO IT!
-Custom todo list in-browser app
+Custom todo list in-browser app that saves to local storage
+- made with only HTML, CSS, and Vanilla JS
 
 ## Features
 - add todos
